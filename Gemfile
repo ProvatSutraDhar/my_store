@@ -75,7 +75,7 @@ end
 
 group :development, :test do
   gem "rails-controller-testing", "~> 1.0.5"
-  gem "rspec-activemodel-mocks", "~> 1.1.0"
+  gem "rspec-activemodel-mocks", "~> 1.3.0"
   gem "factory_bot_rails"
   gem "ffaker", "~> 2.13"
   gem "rubocop-performance", "~> 1.5"
@@ -99,7 +99,7 @@ end
 group :development, :test do
   gem "rspec-rails"
   gem "rails-controller-testing", "~> 1.0.5"
-  gem "rspec-activemodel-mocks", "~> 1.1.0"
+  gem "rspec-activemodel-mocks", "~> 1.3.0"
   gem "factory_bot", ">= 4.8"
   gem "factory_bot_rails"
   gem "ffaker", "~> 2.13"
