@@ -676,6 +676,7 @@ DEPENDENCIES
   rubocop-rails (~> 2.3)
   rubocop-rails-omakase
   rubocop-rspec (~> 3.0)
+  sassc-rails
   selenium-webdriver
   solid_cable
   solid_cache
