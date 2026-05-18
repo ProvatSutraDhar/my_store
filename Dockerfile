@@ -55,7 +55,8 @@ RUN bundle exec bootsnap precompile -j 1 app/ lib/
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
-
+RUN apt-get update -qq && \
+    apt-get install -y nodejs npm
 
 # Final stage for app image
 FROM base
