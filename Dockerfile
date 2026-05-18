@@ -55,8 +55,12 @@ RUN bundle exec bootsnap precompile -j 1 app/ lib/
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
+# Install Node.js (required for ExecJS / assets)
 RUN apt-get update -qq && \
-    apt-get install -y nodejs npm
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+
 
 # Final stage for app image
 FROM base
