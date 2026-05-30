@@ -89,3 +89,9 @@ end
 # the class name:
 #
 # Spree::UserLastUrlStorer.rules << 'Spree::UserLastUrlStorer::Rules::AuthenticationRule'
+Rails.application.configure do
+  config.after_initialize do
+    # Register your new COD payment architecture globally
+    Rails.application.config.spree.payment_methods << "Spree::PaymentMethod::CashOnDelivery"
+  end
+end
