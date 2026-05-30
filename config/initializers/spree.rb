@@ -7,7 +7,10 @@ Spree.load_defaults '4.7.0'
 Spree.config do |config|
   # Core:
   # Default currency for new sites
-  config.currency = "USD"
+  config.currency = "BDT"
+
+  # Add it here without the "spree." prefix:
+  # config.calculators.shipping_methods << Spree::Calculator::Shipping::CustomBangladeshCod
 
   # Uncomment to stop tracking inventory levels in the application
   # config.track_inventory_levels = false

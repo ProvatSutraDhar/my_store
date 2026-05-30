@@ -29,3 +29,9 @@
 
 en:
   hello: "Hello world"
+  spree:
+    calculator_names:
+      custom_bangladesh_cod: "Bangladesh Custom COD (Weight + Order Value)"
+    calculator_preferences:
+      custom_bangladesh_cod:
+        base_amount: "Base Shipping Cost (Tk)"
