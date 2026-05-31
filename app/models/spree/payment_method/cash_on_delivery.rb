@@ -2,32 +2,54 @@
 
 module Spree
   class PaymentMethod::CashOnDelivery < PaymentMethod
-    # Setting this to false prevents Solidus from automatically trying to capture
-    # payment during the checkout confirmation step.
+    # Ensures it doesn't try to capture funds automatically during checkout
     def auto_capture?
       false
     end
 
-    # Explicitly tell Solidus that this payment method supports manual capture later
+    # Explicitly list actions allowed on a pending COD payment line
     def actions
-      %w[capture void credit]
+      %w[capture void]
     end
 
     def can_capture?(payment)
-      payment.pending?
+      payment.pending? || payment.checkout?
     end
 
     def can_void?(payment)
-      payment.pending?
+      payment.pending? || payment.checkout?
     end
 
-    # Fake gateway operations to make Solidus state-machine happy during checkout
+    # No database source model required for offline cash collection
+    def payment_source_class
+      nil
+    end
+
+    def source_required?
+      false
+    end
+
+    # Core change: Tell Solidus to transition this from 'checkout' to 'pending'
+    def purchase(amount_in_cents, source, gateway_options)
+      authorize(amount_in_cents, source, gateway_options)
+    end
+
     def authorize(amount_in_cents, source, gateway_options)
-      ActiveMerchant::Billing::Response.new(true, "COD Authorized (Pay on Delivery)", {}, authorization: "COD-#{(SecureRandom.random_number * 1000000).to_i}")
+      ActiveMerchant::Billing::Response.new(
+        true,
+        "COD Authorized (Awaiting Doorstep Handover)",
+        {},
+        authorization: "COD-#{(SecureRandom.random_number * 1000000).to_i}"
+      )
     end
 
     def capture(amount_in_cents, auth_code, gateway_options)
-      ActiveMerchant::Billing::Response.new(true, "COD Payment Collected & Captured", {}, {})
+      ActiveMerchant::Billing::Response.new(
+        true,
+        "COD Payment Collected From Courier Ledger",
+        {},
+        {}
+      )
     end
 
     def source_type
