@@ -27,27 +27,29 @@
         <% end %>
       <% end %>
 
-      <% order.all_adjustments.nonzero.tax.eligible.group_by(&:label).each do |label, adjustments| %>
-        <div class="checkout-summary__entry <%= dl_classes %>">
-          <dt><%= label %></dt>
-          <dd><%= Spree::Money.new(adjustments.sum(&:amount), currency: order.currency).to_html %></dd>
-        </div>
-      <% end %>
+      <% if order.shipments.any? %>
+        <% 
+          # Calculate totals from your custom calculator logic safely
+          raw_shipping_cost = order.shipments.to_a.sum(&:cost)
+          item_total_amount = order.item_total.to_f
+          
+          # Match your calculator: 1% COD Fee
+          calculated_cod_fee = item_total_amount * 0.01
+          
+          # The structural delivery base cost (Shipping total minus the calculated commission)
+          base_delivery_charge = raw_shipping_cost - calculated_cod_fee
+          base_delivery_charge = 0.0 if base_delivery_charge < 0
+        %>
 
-      <% if order.passed_checkout_step?("delivery") && order.shipments.any? %>
-        <div class="checkout-summary__entry <%= dl_classes %>">
-          <dt><%= t('spree.shipping_total') %>:</dt>
-          <dd><%= Spree::Money.new(order.shipments.to_a.sum(&:cost), currency: order.currency).to_html %></dd>
+        <div class="checkout-summary__entry <%= dl_classes %>" id="delivery-charge">
+          <dt>Delivery Charge:</dt>
+          <dd><%= Spree::Money.new(base_delivery_charge, currency: order.currency).to_html %></dd>
         </div>
 
-        <% if order.shipment_adjustments.nonzero.exists? %>
-          <% order.shipment_adjustments.nonzero.promotion.eligible.group_by(&:label).each do |label, adjustments| %>
-            <div class="checkout-summary__entry <%= dl_classes %>">
-              <dt><%= label %>:</dt>
-              <dd><%= Spree::Money.new(adjustments.sum(&:amount), currency: order.currency).to_html %></dd>
-            </div>
-          <% end %>
-        <% end %>
+        <div class="checkout-summary__entry <%= dl_classes %>" id="cod-fee">
+          <dt>COD Commission Fee (1%):</dt>
+          <dd><%= Spree::Money.new(calculated_cod_fee, currency: order.currency).to_html %></dd>
+        </div>
       <% end %>
 
       <% if order.adjustments.nonzero.non_tax.eligible.exists? %>
