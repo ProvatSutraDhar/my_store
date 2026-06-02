@@ -1,0 +1,57 @@
+<div id="<%= "shipment_#{shipment.id}" %>" class="shipment card" style="background: #ffffff; padding: 20px; margin-bottom: 24px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+  
+  <%# --- MANUAL DROPDOWN FORCING CONTAINER --- %>
+  <div class="manual-state-control" style="background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #cbd5e1; display: flex; align-items: center;">
+    <%= form_with url: main_app.force_admin_shipment_state_path(shipment), method: :post, local: true, style: "display: flex; align-items: center; width: 100%; gap: 12px;" do %>
+      <label style="font-weight: 600; color: #4e73df; font-size: 14px; margin-bottom: 0;">
+        Change Shipment Status (<%= shipment.number %>):
+      </label>
+      <%# UPDATED: Changed 'ready' to 'shipping' in select options %>
+      <%= select_tag :manual_state, 
+                     options_for_select([['System Default (Automatic)', ''], ['Pending', 'pending'], ['Shipping', 'shipping'], ['Shipped', 'shipped']], shipment.manual_state), 
+                     onchange: 'this.form.submit();', 
+                     style: 'padding: 6px 12px; border-radius: 4px; border: 1px solid #ccced1; background: white; font-size: 14px; cursor: pointer;' %>
+    <% end %>
+  </div>
+
+  <%# --- DYNAMIC SOLIDUS SHIPMENT INFO DISPLAY --- %>
+  <div style="margin-bottom: 15px; font-size: 15px; color: #334155;">
+    <strong>Package Number:</strong> <%= shipment.number %> | 
+    <strong>Current State:</strong> 
+    <% 
+      current_display_state = shipment.manual_state.present? ? shipment.manual_state : shipment.read_attribute(:state)
+      badge_color = case current_display_state
+                    when 'shipping' then '#16a34a' # Green for Shipping
+                    when 'shipped' then '#2563eb' # Blue for Shipped
+                    else '#ea580c' # Orange/Pending
+                    end
+    %>
+    <span class="badge" style="background: <%= badge_color %>; color: white; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;"><%= current_display_state.upcase %></span>
+  </div>
+
+  <table class="stock-contents index table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+    <thead>
+      <tr style="border-bottom: 2px solid #e2e8f0; text-align: left; color: #64748b; font-size: 13px;">
+        <th style="padding: 8px;"><%= t('spree.item_description') %></th>
+        <th style="padding: 8px;"><%= t('spree.price') %></th>
+        <th style="padding: 8px;"><%= t('spree.quantity') %></th>
+        <th style="padding: 8px;"><%= t('spree.total_price') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% shipment.manifest.each do |item| %>
+        <tr style="border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b;">
+          <td style="padding: 12px 8px;"><%= item.variant.product.name %></td>
+          <td style="padding: 12px 8px;"><%= item.variant.display_price.to_html %></td>
+          <td style="padding: 12px 8px;"><%= item.quantity %></td>
+          <td style="padding: 12px 8px;"><%= Spree::Money.new(item.line_item.price * item.quantity, currency: shipment.order.currency).to_html %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0; font-size: 14px; color: #64748b;">
+    <strong><%= t('spree.shipping_method') %>:</strong> <%= shipment.shipping_method&.name || "None Selected" %> <br>
+    <strong>Tracking Number:</strong> <%= shipment.tracking.present? ? shipment.tracking : t('spree.no_tracking_details_provided') %>
+  </div>
+</div>

@@ -35,3 +35,6 @@ en:
     calculator_preferences:
       custom_bangladesh_cod:
         base_amount: "Base Shipping Cost (Tk)"
+      
+    shipment_states:
+      shipping: "Shipping"

@@ -1,3 +1,5 @@
+# config/routes.rb
+
 Rails.application.routes.draw do
   # 1. Mount the New Admin UI
   # We remove the constraints for now to ensure it loads
@@ -14,6 +16,9 @@ Rails.application.routes.draw do
   # If you want your store to be at http://localhost:3000/ , 
   # remove the (path: 'store') part.
   scope(path: '/') { draw :storefront }
+
+  # ADD YOUR CUSTOM ROUTE HERE:
+  post '/admin/shipments/:id/force_state', to: 'shipment_overrides#force_state', as: :force_admin_shipment_state
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
